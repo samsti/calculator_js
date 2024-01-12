@@ -1,139 +1,139 @@
-class Calculator {
-    constructor(previousOperandTextElement, currentOperandTextElement) {
-        this.previousOperandTextElement = previousOperandTextElement
-        this.currentOperandTextElement = currentOperandTextElement
-        this.clear()
+class MathGenius {
+    constructor(prevEntry, currEntry) {
+        this.prevEntry = prevEntry;
+        this.currEntry = currEntry;
+        this.initialize();
     }
 
-    clear() {
-        this.currentOperand = ''
-        this.previousOperand = ''
-        this.operation = undefined
+    initialize() {
+        this.currentOperand = '';
+        this.previousOperand = '';
+        this.operation = undefined;
     }
 
-    delete() {
-        this.currentOperand = this.currentOperand.toString().slice(0, -1)
+    removeLastDigit() {
+        this.currentOperand = this.currentOperand.toString().slice(0, -1);
     }
 
-    appendNumber(number) {
-        if (number === '.' && this.currentOperand.includes('.')) {
-            return
+    addDigit(digit) {
+        if (digit === '.' && this.currentOperand.includes('.')) {
+            return;
         }
-        this.currentOperand = this.currentOperand.toString() + number.toString()
+        this.currentOperand = this.currentOperand.toString() + digit.toString();
     }
 
-    chooseOperation(operation) {
+    selectOperation(operator) {
         if (this.currentOperand === '') {
-            return
+            return;
         }
-        if (this.previousOperand != '') {
-            this.compute()
+        if (this.previousOperand !== '') {
+            this.performCalculation();
         }
-        this.operation = operation
-        this.previousOperand = this.currentOperand
-        this.currentOperand = ''
+        this.operation = operator;
+        this.previousOperand = this.currentOperand;
+        this.currentOperand = '';
     }
 
-    compute() {
-        let computation
-        const prev = parseFloat(this.previousOperand)
-        const current = parseFloat(this.currentOperand)
-        if (isNaN(prev) || isNaN(current)) {
-            return
+    performCalculation() {
+        let result;
+        const prevVal = parseFloat(this.previousOperand);
+        const currentVal = parseFloat(this.currentOperand);
+        if (isNaN(prevVal) || isNaN(currentVal)) {
+            return;
         }
         switch (this.operation) {
             case '+':
-                computation = prev + current;
+                result = prevVal + currentVal;
                 break;
 
             case '-':
-                computation = prev - current;
+                result = prevVal - currentVal;
                 break;
 
             case '*':
-                computation = prev * current;
+                result = prevVal * currentVal;
                 break;
 
             case '÷':
-                computation = prev / current;
+                result = prevVal / currentVal;
                 break;
 
             default:
                 return;
         }
-        this.currentOperand = computation
-        this.operation = undefined
-        this.previousOperand = ''
+        this.currentOperand = result;
+        this.operation = undefined;
+        this.previousOperand = '';
     }
 
-    getDisplayNumber(number) {
-        const stringNumber = number.toString()
-        const integerDigits = parseFloat(stringNumber.split('.')[0])
-        const decimalDigits = stringNumber.split('.')[1]
-        let integerDisplay
-        if (isNaN(integerDigits)) {
-            integerDisplay = ''
+    formatDisplayedNumber(digit) {
+        const strDigit = digit.toString();
+        const intPart = parseFloat(strDigit.split('.')[0]);
+        const decimalPart = strDigit.split('.')[1];
+        let intDisplay;
+        if (isNaN(intPart)) {
+            intDisplay = '';
         } else {
-            integerDisplay = integerDigits.toLocaleString('en', {
-                maximumFractionDigits: 0
-            })
+            intDisplay = intPart.toLocaleString('en', {
+                maximumFractionDigits: 0,
+            });
         }
-        if (decimalDigits != null) {
-            return `${integerDisplay}.${decimalDigits}`
+        if (decimalPart !== null) {
+            return `${intDisplay}.${decimalPart}`;
         } else {
-            return integerDisplay
+            return intDisplay;
         }
     }
 
     updateDisplay() {
-        this.currentOperandTextElement.innerText =
-            this.getDisplayNumber(this.currentOperand)
-        if (this.operation != null) {
-            this.previousOperandTextElement.innerText =
-                `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`
+        this.currEntry.innerText = this.formatDisplayedNumber(
+            this.currentOperand
+        );
+        if (this.operation !== null) {
+            this.prevEntry.innerText = `${this.formatDisplayedNumber(
+                this.previousOperand
+            )} ${this.operation}`;
         } else {
-            this.previousOperandTextElement.innerText = ''
+            this.prevEntry.innerText = '';
         }
-
     }
 }
 
-const numberButtons = document.querySelectorAll('[data-number]')
-const operationButtons = document.querySelectorAll('[data-operation]')
-const equalsButton = document.querySelector('[data-equals]')
-const deleteButton = document.querySelector('[data-delete]')
-const allClearButton = document.querySelector('[data-all-clear]')
-const previousOperandTextElement = document.querySelector('[data-previous-operand]')
-const currentOperandTextElement = document.querySelector('[data-current-operand]')
+const digitButtons = document.querySelectorAll('[data-number]');
+const operationButtons = document.querySelectorAll('[data-operation]');
+const equalsButton = document.querySelector('[data-equals]');
+const deleteButton = document.querySelector('[data-delete]');
+const allClearButton = document.querySelector('[data-all-clear]');
+const prevEntry = document.querySelector('[data-previous-entry]');
+const currEntry = document.querySelector('[data-current-entry]');
 
-const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement)
+const mathGenius = new MathGenius(prevEntry, currEntry);
 
-numberButtons.forEach(button => {
+digitButtons.forEach((button) => {
     button.addEventListener('click', () => {
-        calculator.appendNumber(button.innerText)
-        calculator.updateDisplay()
-    })
-})
+        mathGenius.addDigit(button.innerText);
+        mathGenius.updateDisplay();
+    });
+});
 
-operationButtons.forEach(button => {
-
+operationButtons.forEach((button) => {
     button.addEventListener('click', () => {
-        calculator.chooseOperation(button.innerText)
-        calculator.updateDisplay()
-    })
-})
+        mathGenius.selectOperation(button.innerText);
+        mathGenius.updateDisplay();
+    });
+});
 
-equalsButton.addEventListener('click', button => {
-    calculator.compute()
-    calculator.updateDisplay()
-})
+equalsButton.addEventListener('click', () => {
+    mathGenius.performCalculation();
+    mathGenius.updateDisplay();
+});
 
-allClearButton.addEventListener('click', button => {
-    calculator.clear()
-    calculator.updateDisplay()
-})
+allClearButton.addEventListener('click', () => {
+    mathGenius.initialize();
+    mathGenius.updateDisplay();
+});
 
-deleteButton.addEventListener('click', button => {
-    calculator.delete()
-    calculator.updateDisplay()
-})
+deleteButton.addEventListener('click', () => {
+    mathGenius.removeLastDigit();
+    mathGenius.updateDisplay();
+});
